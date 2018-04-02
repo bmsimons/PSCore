@@ -15,27 +15,25 @@ CSCore bindings optimized for PowerShell use.
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
+[TBD]
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Copy the DLL to a local folder and call it from PowerSDhell using something like this:
+
+Add-Type -Path PSCore.dll
+$r = [PSCore.LoopbackRecorder]
+$r::StartRecording("X:\test1.mp3")
+
+(This will lock the DLL until the PowerShell IDE is closed.)
+
+Or this:
+
+[System.Reflection.Assembly]::Load( [System.IO.File]::ReadAllBytes("pscore.dll") )
+$r = [PSCore.LoopbackRecorder]
+$r::StartRecording("X:\test1.mp3")
+
+(The above will not lock the DLL file. It works becauise we do not require explicit bindings when loading the DLL.)
 
 ## Built With
 
@@ -43,11 +41,11 @@ Add additional notes about how to deploy this on a live system
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+[TBD]
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+[TBD]
 
 ## Authors
 
