@@ -35,7 +35,7 @@ Or this:
 $r = [PSCore.LoopbackRecorder]
 $r::StartRecording("X:\test1.mp3")
 
-(The above will not lock the DLL file. It works becauise we do not require explicit bindings when loading the DLL.)
+(The above will not lock the DLL file. It works because we do not require explicit bindings when loading the DLL.)
 
 ## Built With
 
