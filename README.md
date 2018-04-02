@@ -23,6 +23,7 @@ Copy the DLL to a local folder and call it from PowerSDhell using something like
 
 Add-Type -Path PSCore.dll
 $r = [PSCore.LoopbackRecorder]
+
 $r::StartRecording("X:\test1.mp3")
 
 (This will lock the DLL until the PowerShell IDE is closed.)
@@ -30,6 +31,7 @@ $r::StartRecording("X:\test1.mp3")
 Or this:
 
 [System.Reflection.Assembly]::Load( [System.IO.File]::ReadAllBytes("pscore.dll") )
+
 $r = [PSCore.LoopbackRecorder]
 $r::StartRecording("X:\test1.mp3")
 
