@@ -1,23 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CSCore;
 using CSCore.SoundIn;
 using CSCore.Codecs.WAV;
 using CSCore.MediaFoundation;
-using CSCore.CoreAudioAPI;
 using CSCore.Streams;
 
 namespace PSCore
 {
+    public enum WriterType
+    {
+        EncoderWriter,
+        WaveWriter
+    };
+
     public class LoopbackRecorder
     {
         public static WasapiCapture capture;
         public static SoundInSource wasapiCaptureSource;
         public static IWaveSource stereoSource;
-        public static MediaFoundationEncoder w;
+        public static MediaFoundationEncoder encoderWriter;
+        public static WaveWriter waveWriter;
+        public static WriterType writerType;
 
         public static void StartRecording(String fileName, int bitRate = 192000)
         {
@@ -28,36 +31,63 @@ namespace PSCore
             wasapiCaptureSource = new SoundInSource(capture);
             stereoSource = wasapiCaptureSource.ToStereo();
 
-
-            if (fileName.EndsWith(".mp3"))
+            switch (System.IO.Path.GetExtension(fileName))
             {
-                w = MediaFoundationEncoder.CreateMP3Encoder(stereoSource.WaveFormat, fileName, bitRate);
+                case ".mp3":
+                    encoderWriter = MediaFoundationEncoder.CreateMP3Encoder(stereoSource.WaveFormat, fileName, bitRate);
+                    writerType = WriterType.EncoderWriter;
+                    break;
+                case ".wma":
+                    encoderWriter = MediaFoundationEncoder.CreateWMAEncoder(stereoSource.WaveFormat, fileName, bitRate);
+                    writerType = WriterType.EncoderWriter;
+                    break;
+                case ".aac":
+                    encoderWriter = MediaFoundationEncoder.CreateAACEncoder(stereoSource.WaveFormat, fileName, bitRate);
+                    writerType = WriterType.EncoderWriter;
+                    break;
+                case ".wav":
+                    waveWriter = new WaveWriter(fileName, capture.WaveFormat);
+                    writerType = WriterType.WaveWriter;
+                    break;
             }
-            else if (fileName.EndsWith(".wma"))
+
+            switch (writerType)
             {
-                w = MediaFoundationEncoder.CreateWMAEncoder(stereoSource.WaveFormat, fileName, bitRate);
-            }
-            else if (fileName.EndsWith(".aac"))
-            {
-                w = MediaFoundationEncoder.CreateAACEncoder(stereoSource.WaveFormat, fileName, bitRate);
+                case WriterType.EncoderWriter:
+                    capture.DataAvailable += (s, e) =>
+                    {
+                        encoderWriter.Write(e.Data, e.Offset, e.ByteCount);
+                    };
+                    break;
+                case WriterType.WaveWriter:
+                    capture.DataAvailable += (s, e) =>
+                    {
+                        waveWriter.Write(e.Data, e.Offset, e.ByteCount);
+                    };
+                    break;
             }
 
-            capture.DataAvailable += (s, e) =>
-            {
-                w.Write(e.Data, e.Offset, e.ByteCount);
-            };
-
+            // Start recording
             capture.Start();
         }
 
         public static void StopRecording()
         {
+            // Stop recording
             capture.Stop();
-        }
 
-        public static void Dispose()
-        {
-            w.Dispose();
+            // Dispose respective writers (for WAV, Dispose() writes header)
+            switch (writerType)
+            {
+                case WriterType.EncoderWriter:
+                    encoderWriter.Dispose();
+                    break;
+                case WriterType.WaveWriter:
+                    waveWriter.Dispose();
+                    break;
+            }
+
+            // Dispose of other objects
             stereoSource.Dispose();
             wasapiCaptureSource.Dispose();
             capture.Dispose();
