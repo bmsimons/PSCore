@@ -7,7 +7,7 @@ CSCore bindings optimized for PowerShell use.
 
 ### Prerequisites
 
-1. PowerShell .Net 2 or greater.
+1. PowerShell .NET 2 or greater.
 
 ### Installing
 
@@ -19,21 +19,25 @@ CSCore bindings optimized for PowerShell use.
 
 ## Deployment
 
-Copy the DLL to a local folder and call it from PowerSDhell using something like this:
+Copy the DLL to a local folder and call it from PowerShell using something like this:
 
+```csharp
 Add-Type -Path PSCore.dll
 $r = [PSCore.LoopbackRecorder]
 
 $r::StartRecording("X:\test1.mp3")
+```
 
 (This will lock the DLL until the PowerShell IDE is closed.)
 
 Or this:
 
+```csharp
 [System.Reflection.Assembly]::Load( [System.IO.File]::ReadAllBytes("pscore.dll") )
 
 $r = [PSCore.LoopbackRecorder]
 $r::StartRecording("X:\test1.mp3")
+```
 
 (The above will not lock the DLL file. It works because we do not require explicit bindings when loading the DLL.)
 
@@ -53,7 +57,7 @@ $r::StartRecording("X:\test1.mp3")
 
 * **bmsimons** - *Initial work* - [bmsimons](https://github.com/bmsimons)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/bmsimons/PSCore/contributors) who participated in this project.
 
 ## License
 
